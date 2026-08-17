@@ -1,0 +1,31 @@
+Hypertension Management Guideline (Sample Reference Document)
+================================================================
+
+1. Blood pressure categories
+Normal: systolic <120 and diastolic <80 mmHg.
+Elevated: systolic 120-129 and diastolic <80 mmHg.
+Stage 1 hypertension: systolic 130-139 or diastolic 80-89 mmHg.
+Stage 2 hypertension: systolic >=140 or diastolic >=90 mmHg.
+
+2. Initial management
+For Stage 1 hypertension with low estimated 10-year cardiovascular risk,
+lifestyle modification alone (sodium restriction, DASH-style diet,
+physical activity, weight loss, alcohol moderation) for 3-6 months is
+reasonable before adding medication.
+
+3. Pharmacologic therapy
+First-line agents include thiazide diuretics, ACE inhibitors, ARBs, and
+calcium channel blockers. ACE inhibitors and ARBs are preferred in
+patients with diabetes and albuminuria, or with heart failure with
+reduced ejection fraction. Avoid combining an ACE inhibitor with an ARB.
+
+4. Follow-up
+Recheck blood pressure within 1 month of starting or adjusting therapy.
+Once at goal, routine follow-up every 3-6 months is reasonable for stable
+patients.
+
+5. Resistant hypertension
+Defined as blood pressure above goal despite three antihypertensive
+agents of different classes, one of which is a diuretic, at maximally
+tolerated doses. Evaluate for secondary causes and medication
+non-adherence before adding a fourth agent (commonly spironolactone).

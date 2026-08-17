@@ -1,0 +1,39 @@
+Type 2 Diabetes Management Guideline (Sample Reference Document)
+==================================================================
+
+1. Diagnosis
+Type 2 diabetes is diagnosed via fasting plasma glucose >= 126 mg/dL,
+HbA1c >= 6.5%, or a 2-hour plasma glucose >= 200 mg/dL during an oral
+glucose tolerance test, confirmed on repeat testing unless the patient
+has unambiguous hyperglycemia symptoms.
+
+2. First-line pharmacologic therapy
+Metformin remains first-line therapy for most newly diagnosed patients
+unless contraindicated (e.g. eGFR < 30 mL/min/1.73m^2, acute illness with
+risk of lactic acidosis). Typical starting dose is 500mg once or twice
+daily with meals, titrated up to reduce GI side effects.
+
+3. Second-line options
+When HbA1c remains above target on metformin monotherapy, consider adding
+a GLP-1 receptor agonist or SGLT2 inhibitor, particularly in patients with
+established cardiovascular disease, heart failure, or chronic kidney
+disease, where these classes have demonstrated outcome benefits beyond
+glycemic control.
+
+4. Monitoring
+HbA1c should be checked every 3 months until stable at target, then every
+6 months. Target HbA1c is generally <7% for most adults, individualized
+higher (e.g. <8%) for patients with limited life expectancy, extensive
+comorbidity, or history of severe hypoglycemia.
+
+5. Hypoglycemia management
+Mild hypoglycemia (patient conscious, able to swallow): give 15-20g fast
+acting carbohydrate, recheck glucose in 15 minutes, repeat if still low.
+Severe hypoglycemia (altered consciousness): glucagon administration or
+emergency services; do not give oral carbohydrate if the patient cannot
+safely swallow.
+
+6. Lifestyle counseling
+All patients should receive counseling on carbohydrate-consistent eating
+patterns, regular physical activity (at least 150 minutes/week of
+moderate-intensity activity), and weight management where applicable.

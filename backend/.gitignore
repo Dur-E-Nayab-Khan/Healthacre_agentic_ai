@@ -1,0 +1,6 @@
+.env
+healthcare_demo.db
+__pycache__/
+*.pyc
+
+chroma_store/

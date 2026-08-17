@@ -7,10 +7,6 @@ Run:
     cp .env.example .env   # paste in a free Gemini key from https://aistudio.google.com/apikey
     uvicorn main:app --reload --port 8000 --reload-exclude "chroma_store/*" --reload-exclude "healthcare_demo.db" --reload-exclude "knowledge_base/*"
 
-    (the --reload-exclude flags matter: chroma_store/ and healthcare_demo.db
-    change at runtime, and without excluding them --reload restarts the
-    server mid-request whenever the RAG index updates.)
-
 Docs: http://localhost:8000/docs
 """
 import os
@@ -35,10 +31,11 @@ import knowledge_rag
 
 app = FastAPI(title="Synthetic Healthcare Agentic AI (Security Test Target)")
 
-# Loosened for local testing -- tighten before exposing beyond localhost.
+# Permissive CORS setup to allow Vercel frontends and local dev environments
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -48,15 +45,7 @@ FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 @app.get("/")
 def serve_frontend():
-    """Serves the chat UI at the app's root URL, so the whole thing is one
-    deployable service with one shareable URL (no separate frontend host,
-    no cross-origin setup needed once deployed).
-
-    Served from backend/static/ (a copy of frontend/index.html) rather than
-    a sibling ../frontend/ folder -- some hosts (e.g. Railway with Root
-    Directory set to backend/) only package the configured root directory
-    into the deployed container, so a path that reaches outside it can be
-    missing at runtime even though it exists in the repo."""
+    """Serves the chat UI at the app's root URL."""
     index_path = os.path.join(FRONTEND_DIR, "index.html")
     if not os.path.isfile(index_path):
         raise HTTPException(
@@ -106,8 +95,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 # ---------- patient records ----------
 
 def _resolve_patient(db: Session, current_user: User, requested_patient_id: Optional[int]) -> Patient:
-    """Shared access-control logic: patients may only ever resolve to their
-    own record; staff must explicitly pass a patient_id."""
+    """Shared access-control logic."""
     if current_user.role == "patient":
         patient_id = current_user.patient_id
     else:
@@ -167,9 +155,6 @@ def health():
 
 
 # ---------- file-based RAG demo ----------
-# Classic RAG: files on disk -> chunk -> embed -> vector store -> retrieve
-# top-k -> answer grounded in retrieved chunks. Independent of the
-# patient-notes retrieval used by /chat.
 
 @app.get("/rag/files")
 def rag_list_files(current_user: User = Depends(get_current_user)):
@@ -178,8 +163,6 @@ def rag_list_files(current_user: User = Depends(get_current_user)):
 
 @app.post("/rag/reindex")
 def rag_reindex(current_user: User = Depends(get_current_user)):
-    """Call this after adding/removing files in backend/knowledge_base/,
-    or after using /rag/upload, to rebuild the vector index."""
     chunk_count = knowledge_rag.build_index()
     return {"status": "reindexed", "files": knowledge_rag.list_knowledge_files(), "chunks": chunk_count}
 
@@ -199,6 +182,4 @@ async def rag_upload(file: UploadFile, current_user: User = Depends(get_current_
 
 @app.post("/rag/query")
 def rag_query(req: RagQueryRequest, current_user: User = Depends(get_current_user)):
-    """Ask a question answered from the indexed files, with the retrieved
-    source chunks returned alongside the answer."""
     return knowledge_rag.query_knowledge_base(req.question, k=req.k)

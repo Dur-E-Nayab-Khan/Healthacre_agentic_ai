@@ -4,7 +4,7 @@ Multi-agent orchestration -- LangGraph + LangChain, Gemini backend.
 This uses the standard LangGraph "ReAct agent" prebuilt (create_react_agent)
 rather than a hand-rolled tool loop:
 
-  - Tools        -> LangChain @tool-decorated functions, one per capability:
+  - Tools         -> LangChain @tool-decorated functions, one per capability:
                      retrieve_patient_records (RAG), recall_memory,
                      remember_fact (long-term memory write)
   - Short-term /
@@ -48,7 +48,7 @@ load_dotenv()
 
 from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.agents import create_agent
+
 from langgraph.checkpoint.memory import MemorySaver
 
 from database import Patient
@@ -145,7 +145,12 @@ def run_agent_turn(db: Session, patient: Patient, session_id: str, user_message:
 
     tools = _build_tools(db, patient)
     system = SYSTEM_PROMPT.format(patient_id=patient.id, patient_name=patient.full_name)
-    agent = create_agent(llm, tools, system_prompt=system, checkpointer=checkpointer)
+    agent = create_react_agent(
+        model=llm,
+        tools=tools,
+        prompt=system,
+        checkpointer=checkpointer,
+    )
 
     # Scoping the thread by patient_id as well as session_id means a reused
     # or guessed session_id alone can't splice one patient's conversation

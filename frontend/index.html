@@ -1,228 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chart & Console — Synthetic Care Agent</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper:#F7F5F0;
-    --ink:#1D2B27;
-    --teal:#2F6F62;
-    --teal-dim:#DCE8E4;
-    --coral:#C1573A;
-    --line:#D8D2C4;
-    --panel:#FFFFFF;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; background:var(--paper); color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
-    min-height:100vh;
-  }
-  .topbar{
-    display:flex; align-items:baseline; justify-content:space-between;
-    padding:20px 28px; border-bottom:1px solid var(--line);
-  }
-  .topbar h1{
-    font-family:'Fraunces', serif; font-weight:600; font-size:22px; margin:0;
-    letter-spacing:-0.01em;
-  }
-  .topbar .tag{
-    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--teal);
-    border:1px solid var(--teal); padding:3px 8px; border-radius:3px;
-  }
-  #login-view{
-    max-width:380px; margin:80px auto; background:var(--panel);
-    border:1px solid var(--line); border-radius:6px; padding:32px;
-  }
-  #login-view h2{ font-family:'Fraunces', serif; font-size:20px; margin-top:0;}
-  #login-view p{ font-size:13px; color:#5b665f; line-height:1.5;}
-  label{ display:block; font-size:12px; font-weight:500; margin:14px 0 4px; color:#4a544e;}
-  input{
-    width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:4px;
-    font-family:'IBM Plex Mono', monospace; font-size:13px; background:#FBFAF7;
-  }
-  button{
-    font-family:'IBM Plex Sans', sans-serif; font-weight:600; font-size:13px;
-    background:var(--teal); color:#fff; border:none; border-radius:4px;
-    padding:10px 16px; cursor:pointer; margin-top:16px; width:100%;
-  }
-  button:hover{ background:#255a4f; }
-  .err{ color:var(--coral); font-size:12px; margin-top:8px; min-height:14px;}
-  .demo-accounts{
-    margin-top:18px; padding-top:14px; border-top:1px dashed var(--line);
-    font-family:'IBM Plex Mono', monospace; font-size:11px; color:#7a8279; line-height:1.7;
-  }
-
-  #app-view{ display:none; grid-template-columns: 300px 1fr; min-height: calc(100vh - 65px); }
-  .chart-panel{
-    border-right:1px solid var(--line); padding:22px; background:#FBFAF7;
-  }
-  .chart-panel h3{ font-family:'Fraunces', serif; font-size:15px; margin:0 0 14px;}
-  .field{ margin-bottom:12px; }
-  .field .k{ font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:#8a9189;}
-  .field .v{ font-family:'IBM Plex Mono', monospace; font-size:13px; margin-top:2px;}
-  .role-badge{
-    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11px;
-    background:var(--teal-dim); color:var(--teal); padding:2px 7px; border-radius:3px;
-  }
-  .patient-picker{ margin-top:18px; }
-
-  .chat-panel{ display:flex; flex-direction:column; padding:22px 28px; }
-  #messages{ flex:1; overflow-y:auto; max-height:70vh; padding-right:6px; }
-  .msg{ margin-bottom:18px; max-width:78%; }
-  .msg.user{ margin-left:auto; }
-  .bubble{
-    padding:11px 14px; border-radius:8px; font-size:14px; line-height:1.55;
-  }
-  .msg.user .bubble{ background:var(--ink); color:#fff; border-radius:8px 8px 2px 8px;}
-  .msg.assistant .bubble{ background:var(--panel); border:1px solid var(--line); border-radius:8px 8px 8px 2px;}
-  .trace{
-    margin-top:6px; font-family:'IBM Plex Mono', monospace; font-size:11px;
-    color:#7a8279; background:#F2F0E9; border:1px solid var(--line);
-    border-radius:4px; padding:8px 10px; white-space:pre-wrap;
-  }
-  .trace .line{ margin:2px 0; }
-  .trace .tool-name{ color:var(--teal); }
-  .composer{ display:flex; gap:8px; margin-top:14px; }
-  .composer input{ flex:1; }
-  .composer button{ width:auto; margin-top:0; }
-
-  .tabs{ display:flex; gap:4px; padding:0 28px; border-bottom:1px solid var(--line); background:#FBFAF7; }
-  .tab{
-    font-family:'IBM Plex Sans', sans-serif; font-size:13px; font-weight:600;
-    padding:12px 16px; cursor:pointer; color:#7a8279; border-bottom:2px solid transparent;
-    user-select:none;
-  }
-  .tab.active{ color:var(--teal); border-bottom-color:var(--teal); }
-  .rag-panel{ display:none; padding:22px 28px; }
-  .rag-panel.active{ display:block; }
-  .rag-panel h3{ font-family:'Fraunces', serif; font-size:16px; margin:0 0 6px; }
-  .rag-panel .sub{ font-size:12px; color:#7a8279; margin-bottom:18px; line-height:1.5; }
-  .rag-file-row{ display:flex; gap:8px; align-items:center; margin-bottom:10px; }
-  .rag-file-row input[type=file]{ flex:1; padding:6px; border:1px solid var(--line); border-radius:4px; background:#FBFAF7; font-size:12px; }
-  .rag-file-row button{ width:auto; margin-top:0; padding:9px 14px; }
-  .file-list{
-    font-family:'IBM Plex Mono', monospace; font-size:12px; color:#4a544e;
-    background:#FBFAF7; border:1px solid var(--line); border-radius:4px;
-    padding:10px 12px; margin-bottom:18px; min-height:20px;
-  }
-  .file-list .empty{ color:#9aa19a; }
-  .rag-answer{
-    background:var(--panel); border:1px solid var(--line); border-radius:8px;
-    padding:14px 16px; font-size:14px; line-height:1.6; margin-top:16px; white-space:pre-wrap;
-  }
-  .rag-sources{ margin-top:12px; }
-  .rag-sources .k{ font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:#8a9189; margin-bottom:6px; }
-  .source-card{
-    background:#F2F0E9; border:1px solid var(--line); border-radius:4px;
-    padding:8px 10px; margin-bottom:6px; font-size:12px;
-  }
-  .source-card .fname{ font-family:'IBM Plex Mono', monospace; color:var(--teal); font-weight:600; }
-  .source-card .rel{ float:right; color:#8a9189; font-family:'IBM Plex Mono', monospace; }
-  .source-card .excerpt{ margin-top:4px; color:#5b665f; }
-</style>
-</head>
-<body>
-
-<div class="topbar">
-  <h1>Chart &amp; Console</h1>
-  <span class="tag">synthetic data · security test target</span>
-</div>
-
-<div id="login-view">
-  <h2>Sign in</h2>
-  <p>Every account and record here is synthetic. Use this instance only against a system you own or are authorized to test.</p>
-  <label>Username</label>
-  <input id="username" autocomplete="off" />
-  <label>Password</label>
-  <input id="password" type="password" autocomplete="off" />
-  <button onclick="login()">Sign in</button>
-  <div class="err" id="login-err"></div>
-  <div class="demo-accounts">
-    admin / admin123 — role: admin<br>
-    dr_raza / doctor123 — role: doctor<br>
-    patient1 / patient123 — role: patient (Ayesha Khan)<br>
-    patient2 / patient123 — role: patient (Bilal Ahmed)
-  </div>
-</div>
-
-<div id="app-view">
-  <div class="chart-panel">
-    <h3>Session</h3>
-    <div class="field"><div class="k">Role</div><div class="v"><span class="role-badge" id="role-badge"></span></div></div>
-    <div class="field" id="staff-picker-field" style="display:none;">
-      <div class="k">Target patient_id</div>
-      <input id="patient-id-input" type="number" value="1" style="margin-top:4px;" />
-    </div>
-    <div class="field"><div class="k">Patient</div><div class="v" id="patient-name">—</div></div>
-    <div class="field"><div class="k">MRN</div><div class="v" id="patient-mrn">—</div></div>
-    <div class="field"><div class="k">Primary Dx</div><div class="v" id="patient-dx">—</div></div>
-    <div class="field"><div class="k">Medications</div><div class="v" id="patient-meds">—</div></div>
-    <button onclick="loadPatient()" style="margin-top:8px;">Load patient record</button>
-    <button onclick="logout()" style="margin-top:8px; background:transparent; color:var(--coral); border:1px solid var(--coral);">Sign out</button>
-  </div>
-
-  <div style="flex:1; display:flex; flex-direction:column;">
-    <div class="tabs">
-      <div class="tab active" id="tab-chat" onclick="switchTab('chat')">Patient Chat</div>
-      <div class="tab" id="tab-rag" onclick="switchTab('rag')">Document Q&amp;A (RAG)</div>
-    </div>
-
-    <div class="chat-panel" id="panel-chat">
-      <div id="messages"></div>
-      <div class="composer">
-        <input id="chat-input" placeholder="Ask the care agent about this patient…" onkeydown="if(event.key==='Enter')sendMessage()" />
-        <button onclick="sendMessage()">Send</button>
-      </div>
-    </div>
-
-    <div class="rag-panel" id="panel-rag">
-      <h3>Document Q&amp;A</h3>
-      <div class="sub">Ask questions answered strictly from files in <code>backend/knowledge_base/</code>. This is the classic RAG pipeline — file → chunk → embed → retrieve → grounded answer — separate from the patient chat agent.</div>
-
-      <div class="rag-file-row">
-        <input type="file" id="rag-file-input" accept=".txt,.md,.pdf" />
-        <button onclick="uploadRagFile()">Upload &amp; reindex</button>
-        <button onclick="reindexRag()" style="background:transparent; color:var(--teal); border:1px solid var(--teal);">Reindex</button>
-      </div>
-      <div class="file-list" id="rag-file-list"><span class="empty">Loading indexed files…</span></div>
-
-      <div class="composer">
-        <input id="rag-question-input" placeholder="Ask a question about the uploaded documents…" onkeydown="if(event.key==='Enter')askRag()" />
-        <button onclick="askRag()">Ask</button>
-      </div>
-
-      <div id="rag-answer-wrap"></div>
-    </div>
-  </div>
-</div>
-
 <script>
-const API = window.location.origin.includes('localhost') || window.location.protocol === 'file:'
-  ? "http://localhost:8000"
-  : window.location.origin;
+// Detect if running on Vercel or locally, and route API calls to the live backend URL
+const BACKEND_CLOUD_URL = "https://healthacre-agentic-ai-production.up.railway.app"; // <-- Replace with your actual deployed backend platform URL
+
+const API = (window.location.hostname.includes("vercel.app"))
+  ? BACKEND_CLOUD_URL
+  : (window.location.origin.includes('localhost') || window.location.protocol === 'file:')
+    ? "http://localhost:8000"
+    : window.location.origin;
+
 let token = null, role = null, sessionId = "sess-" + Math.random().toString(36).slice(2);
 
 async function login(){
   const u = document.getElementById('username').value;
   const p = document.getElementById('password').value;
   const body = new URLSearchParams({ username: u, password: p });
-  const res = await fetch(`${API}/auth/login`, { method:'POST', body });
-  if(!res.ok){
-    document.getElementById('login-err').textContent = "Login failed.";
-    return;
+  
+  try {
+    const res = await fetch(`${API}/auth/login`, { method:'POST', body });
+    if(!res.ok){
+      document.getElementById('login-err').textContent = "Login failed. Check username/password or backend status.";
+      return;
+    }
+    const data = await res.json();
+    token = data.access_token; role = data.role;
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('app-view').style.display = 'grid';
+    document.getElementById('role-badge').textContent = role;
+    document.getElementById('staff-picker-field').style.display = (role === 'patient') ? 'none' : 'block';
+    loadPatient();
+  } catch (err) {
+    document.getElementById('login-err').textContent = `Connection error to ${API}`;
   }
-  const data = await res.json();
-  token = data.access_token; role = data.role;
-  document.getElementById('login-view').style.display = 'none';
-  document.getElementById('app-view').style.display = 'grid';
-  document.getElementById('role-badge').textContent = role;
-  document.getElementById('staff-picker-field').style.display = (role === 'patient') ? 'none' : 'block';
-  loadPatient();
 }
 
 function logout(){
@@ -241,9 +49,6 @@ async function loadPatient(){
   const pid = role === 'patient' ? 'me' : currentPatientId();
   const url = role === 'patient' ? null : `${API}/patients/${pid}`;
   if(role === 'patient'){
-    // patient accounts hit /patients/{their own id}; but they may not know it,
-    // so we just try id 0 first via /patients (staff-only) - fallback: ask backend
-    // Simplify: try common ids 1..5 until one resolves under this token.
     for(let i=1;i<=5;i++){
       const r = await fetch(`${API}/patients/${i}`, { headers:{Authorization:`Bearer ${token}`} });
       if(r.ok){ renderPatient(await r.json()); return; }
@@ -358,7 +163,7 @@ async function askRag(){
   wrap.innerHTML = '<div class="rag-answer">Thinking… (first question after startup can take longer — it builds the index)</div>';
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s safety timeout
+  const timeoutId = setTimeout(() => controller.abort(), 45000);
 
   try {
     const res = await fetch(`${API}/rag/query`, {
@@ -388,9 +193,9 @@ async function askRag(){
   } catch (err) {
     clearTimeout(timeoutId);
     if(err.name === 'AbortError'){
-      wrap.innerHTML = `<div class="rag-answer">Request timed out after 45s. Check the terminal running uvicorn for the actual error — likely causes: invalid/missing GEMINI_API_KEY, hitting free-tier rate limits, or a network issue reaching Google's API.</div>`;
+      wrap.innerHTML = `<div class="rag-answer">Request timed out after 45s. Check backend server logs for GEMINI_API_KEY errors.</div>`;
     } else {
-      wrap.innerHTML = `<div class="rag-answer">Request failed: ${err.message}. Is the backend running at ${API}? Check the browser console (F12) for details.</div>`;
+      wrap.innerHTML = `<div class="rag-answer">Request failed: ${err.message}. Is the backend running at ${API}?</div>`;
     }
   }
 }
@@ -401,5 +206,3 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 </script>
-</body>
-</html>

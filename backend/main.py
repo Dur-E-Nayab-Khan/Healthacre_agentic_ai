@@ -58,6 +58,8 @@ def serve_frontend():
 @app.on_event("startup")
 def on_startup():
     init_db()
+    import seed_data
+    seed_data.run()
 
 
 # ---------- schemas ----------
